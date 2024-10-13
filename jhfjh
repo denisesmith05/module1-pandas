@@ -1,0 +1,108 @@
+# Question 1: Count of individuals in each job role sorted by role name
+# Count individuals in each job role
+job_role_counts = df['DevType'].value_counts().reset_index()
+job_role_counts.columns = ['JobRole', 'Count']
+
+# Sort by job role name
+job_role_counts.sort_values('JobRole', inplace=True)
+
+print("\nCount of Individuals by Job Role:")
+print(job_role_counts)
+
+# Question 4: Count of different programming languages employees want to learn
+# Extract languages employees want to learn
+# Assuming 'LanguageWantToWorkWith' contains semicolon-separated languages
+language_want_count = df['LanguageWantToWorkWith'].dropna().str.split(';').explode().value_counts()
+
+print("\nCount of Different Programming Languages Employees Want to Learn:")
+print(language_want_count)
+# Question 5: Average salary of employees by their country
+# Group by country and calculate the average salary
+average_salary_by_country = df.groupby('Country')['ConvertedCompYearly'].mean().reset_index()
+
+# Sort by country name for better readability
+average_salary_by_country.sort_values('Country', inplace=True)
+
+print("\nAverage Salary by Country:")
+print(average_salary_by_country)
+# Question 6: Count of employees in each organization size sorted by size in ascending order
+# Count employees in each organization size
+org_size_counts = df['OrgSize'].value_counts().reset_index()
+org_size_counts.columns = ['OrganizationSize', 'Count']
+
+# Sort by organization size
+org_size_counts.sort_values('OrganizationSize', inplace=True)
+
+print("\nCount of Employees by Organization Size:")
+print(org_size_counts)
+# Question 7: Percentage of employees satisfied with their jobs
+# Define a satisfaction threshold
+satisfaction_threshold = 7  # Example threshold for satisfaction score
+
+# Count satisfied employees
+satisfied_count = df[df['JobSatPoints_1'] > satisfaction_threshold].shape[0]
+total_employees_count = df.shape[0]
+
+# Calculate percentage
+satisfaction_percentage = (satisfied_count / total_employees_count * 100) if total_employees_count > 0 else 0
+
+print(f"\nPercentage of employees satisfied with their jobs: {satisfaction_percentage:.2f}%")
+# Question 8: Count of unique tools employees have experience with
+# Assuming 'ToolsTechHaveWorkedWith' contains semicolon-separated tools
+tools_experience_count = df['ToolsTechHaveWorkedWith'].dropna().str.split(';').explode().nunique()
+
+print(f"\nNumber of unique tools employees have experience with: {tools_experience_count}")
+# Question 9: Average years of coding experience among employees who have worked with specific programming languages
+# Define a list of specific programming languages to filter
+specific_languages = ['Python', 'Java', 'JavaScript']  # Example languages
+
+# Filter for employees who have worked with the specified languages
+coding_experience_specific_languages = df[df['LanguageHaveWorkedWith'].str.contains('|'.join(specific_languages), na=False)]
+
+# Convert YearsCode to numeric, coercing errors to NaN (for non-numeric values)
+# Use .loc to avoid SettingWithCopyWarning
+coding_experience_specific_languages.loc[:, 'YearsCode'] = pd.to_numeric(coding_experience_specific_languages['YearsCode'], errors='coerce')
+
+# Calculate the average years of coding experience, dropping NaN values
+average_years_coding = coding_experience_specific_languages['YearsCode'].mean()
+
+print(f"\nAverage years of coding experience among employees who have worked with {', '.join(specific_languages)}: {average_years_coding:.2f}")
+# Question 10: Count of Employees by Years of Experience
+# Define experience ranges
+bins = [0, 1, 3, 5, 10, 20, 30, 40]  # Define bins for experience ranges
+labels = ['0-1 Years', '1-3 Years', '3-5 Years', '5-10 Years', '10-20 Years', '20-30 Years', '30+ Years']
+
+# Convert 'YearsCode' to numeric (if not already)
+df['YearsCode'] = pd.to_numeric(df['YearsCode'], errors='coerce')
+
+# Cut the 'YearsCode' into the defined bins
+df['ExperienceRange'] = pd.cut(df['YearsCode'], bins=bins, labels=labels, right=False)
+
+# Count the number of employees in each experience range
+experience_counts = df['ExperienceRange'].value_counts().reset_index()
+experience_counts.columns = ['ExperienceRange', 'Count']
+
+# Sort by experience range for better readability
+experience_counts.sort_values('ExperienceRange', inplace=True)
+
+print("\nCount of Employees by Years of Experience:")
+print(experience_counts)
+# Question 11: Average Salary of Employees by Job Role
+# Convert 'ConvertedCompYearly' to numeric (if not already)
+df['ConvertedCompYearly'] = pd.to_numeric(df['ConvertedCompYearly'], errors='coerce')
+
+# Extract job roles into a list
+# Assuming 'DevType' contains semicolon-separated job roles
+df['JobRole'] = df['DevType'].dropna().str.split(';').explode()
+
+# Group by job role and calculate average salary
+average_salary_by_job_role = df.groupby('JobRole')['ConvertedCompYearly'].mean().reset_index()
+
+# Round the average salary to two decimal places
+average_salary_by_job_role['ConvertedCompYearly'] = average_salary_by_job_role['ConvertedCompYearly'].round(2)
+
+# Sort by average salary in descending order for better readability
+average_salary_by_job_role.sort_values('ConvertedCompYearly', ascending=False, inplace=True)
+
+print("\nAverage Salary by Job Role:")
+print(average_salary_by_job_role)
